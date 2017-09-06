@@ -1,3 +1,3 @@
-Star World Credit Application Platform
+Star World Credit Application Platform (CAP)
 
 
