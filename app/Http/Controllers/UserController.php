@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use League\Flysystem\Exception;
 
 class UserController extends Controller
 {
@@ -59,5 +60,31 @@ class UserController extends Controller
             return redirect()->to('users');
         }
         return back()->with('errors',$validator->errors());
+    }
+
+    public function fetchuser(Request $request){
+        $user = User::findOrFail($request->get('id'));
+        return response()->json($user);
+    }
+    public function updateuser(Request $request){
+        try {
+            $user = User::findOrFail($request->get('id'));
+            $user->name = $request->get('name');
+            $user->email = $request->get('email');
+            $user->admin = $request->get('admin');
+            $user->save();
+            return response()->json(['success'=>true,'error'=>false,'msg'=>'Record updated successfully !!']);
+        }catch (Exception $e){
+            return response()->json(['success'=>false,'error'=>true,'msg'=>$e->getMessage()]);
+        }
+    }
+    public function deleteuser(Request $request){
+        try {
+            $user = User::findOrFail($request->get('id'));
+            $user->forceDelete();
+            return response()->json(['success'=>true,'error'=>false,'msg'=>'Record deleted successfully !!']);
+        }catch (Exception $e){
+            return response()->json(['success'=>false,'error'=>true,'msg'=>$e->getMessage()]);
+        }
     }
 }

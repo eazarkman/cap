@@ -22,4 +22,7 @@ Route::get('/sales', 'SalesController@index');
 Route::get('/checkapp', 'SalesController@checkapp');
 Route::get('/expense', 'ExpenseController@index');
 Route::get('/users', 'UserController@index');
+Route::get('/fetchuser', 'UserController@fetchuser');
+Route::get('/destroyuser', 'UserController@deleteuser');
+Route::post('/updateuser', 'UserController@updateuser');
 Route::post('/user/register', 'UserController@register');

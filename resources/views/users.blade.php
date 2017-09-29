@@ -27,6 +27,7 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Admin</th>
+                                    <th>Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -41,6 +42,11 @@
                                             Associate
                                         @endif
                                     </td>
+                                    <td>
+                                       <a style="cursor: pointer;" onclick="editUser('{{ $user->id }}')">Edit</a>
+                                        |
+                                       <a style="cursor: pointer;" onclick="deleteUser('{{ $user->id }}')">Delete</a>
+                                    </td>
                                 </tr>
                                 @endforeach
                                 </tbody>
@@ -49,6 +55,7 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Admin</th>
+                                    <th>Action</th>
                                 </tr>
                                 </tfoot>
                             </table>
@@ -166,6 +173,73 @@
         </div>
 
 
+
+        <div class="container" id="user-update" style="display:none">
+            <div class="row">
+                <div id="result"></div>
+                <div class="col-md-8 col-md-offset-2">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">User Info</div>
+                        <div class="panel-body">
+                            <form class="form-horizontal" role="form" method="POST" action="{{ url('/userupdate') }}">
+                               <input type="hidden" id="updateId">
+                                <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
+                                    <label for="name" class="col-md-4 control-label">Name</label>
+                                    <div class="col-md-6">
+                                        <input id="updatename" type="text" class="form-control" name="name" value="{{ old('name') }}" required autofocus>
+                                        @if ($errors->has('name'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('name') }}</strong>
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+                                    <label for="email" class="col-md-4 control-label">E-Mail Address</label>
+
+                                    <div class="col-md-6">
+                                        <input id="updateemail" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
+
+                                        @if ($errors->has('email'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('email') }}</strong>
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="form-group{{ $errors->has('admin') ? ' has-error' : '' }}">
+                                    <label for="equity" class="col-md-4 control-label">Admin ? </label>
+                                    <div class="col-md-6 input-group">
+                                        <div class="form-group">
+                                            <select class="form-control" name="admin" id="updateadmin">
+                                                <option value="1">Admin</option>
+                                                <option value="0">Associate</option>
+                                            </select>
+                                        </div>
+                                        @if ($errors->has('admin'))
+                                            <span class="help-block">
+                                        <strong>{{ $errors->first('admin') }}</strong>
+                                    </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </form>
+                                <div class="form-group">
+                                    <div class="col-md-6 col-md-offset-4">
+                                        <button type="submit" onclick="updateUser()" class="btn btn-primary">
+                                            Update User
+                                        </button>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
     <!-- /.content-wrapper -->
     @include('layouts.contentfooter')
@@ -192,6 +266,39 @@
                 $("#results").html(results);
             });
         });
+
+        function editUser(id) {
+            $.get('fetchuser', {id: id},
+                    function(data) {
+                        $("#updateId").val(data.id);
+                        $("#updatename").val(data.name);
+                        $("#updateemail").val(data.email);
+                        $("#updateadmin").val(data.admin);
+                        $("#user-update").show();
+                    });
+        }
+        function deleteUser(id) {
+            $.get('destroyuser', {id: id},
+                    function(data) {
+                        alert(data.msg);
+                        location.reload();
+                    });
+            return false;
+        }
+
+        function updateUser() {
+            $.post('updateuser', { id: $("#updateId").val()
+                                  ,name: $("#updatename").val()
+                                  ,email: $("#updateemail").val()
+                                  ,admin: $("#updateadmin").val()
+                                  ,_token: document.getElementsByName("_token")[0].value
+                                 },
+                    function(data) {
+                        alert(data.msg);
+                        location.reload();
+                    });
+            return false;
+        }
 
     </script>
 
