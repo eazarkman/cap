@@ -27,7 +27,7 @@ class SalesController extends Controller
         $users = User::all();
         return view('sales',compact('users'));
     }
-    public function checkapp()
+    public function checkapp(Request $request)
     {
         //TODO :: Grab value from DB and populate here
        // TODO :: Conditional check
@@ -39,12 +39,13 @@ class SalesController extends Controller
                     , 'state' => 'CA'
                     , 'phone' => '2589631254'
                     , 'email' => 'any@thing.com'
-                    , 'source' => $this->getSource(710)
+                    , 'source' => $request->get('source')
                 ];
 
         //$result = ['status'=>'not found'];
         return response()->json($result);
     }
+    //TODO :: This function can be used to validate and prompt as suggestion but not have effect on the source
     protected function getSource($score){
         // TODO :: Add more complex rules when available
         if($score>=720){

@@ -19,6 +19,18 @@
                             </div>
                         </div>
                         <div style="clear: both; padding: 10px;"></div>
+                        <div class="form-group">
+                            <label for="equity" class="col-md-4 control-label">Source </label>
+                            <div class="col-md-6 input-group">
+                                <div class="form-group">
+                                    <select class="form-control" name="admin" id="source" style="width: 374px;margin-left: 15px;">
+                                        <option value="sw">Starworld</option>
+                                        <option value="bread">Bread</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="clear: both; padding: 10px;"></div>
                         <div class="col-xs-4">
                             <button type="button" class="btn btn-block btn-info btn-lg" onclick="checkApplication()">Check App Status</button>
                         </div>
@@ -335,7 +347,7 @@
                };
 
            function checkApplication() {
-               $.get('checkapp', {appnumber: $("#app_id").val()},
+               $.get('checkapp', {appnumber: $("#app_id").val(),source: $("#source").val()},
                        function(data) {
                            if(data.status=='not found'){
                                alert('No Application Found !!');
