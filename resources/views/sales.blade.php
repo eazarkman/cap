@@ -324,7 +324,7 @@
                        $("table#cartItems tbody").append(markup);
                        items.push({
                            name: name,
-                           price: parseFloat(price),
+                           price: parseFloat(parseFloat(price)*100),
                            sku: sku,
                            quantity: parseFloat(qty),
                            detailUrl : '[REPLACEMEWITHAREALURL]'
