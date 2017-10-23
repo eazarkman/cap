@@ -27,6 +27,13 @@ class SalesController extends Controller
         $users = User::all();
         return view('sales',compact('users'));
     }
+
+    public function confirm()
+    {
+        $users = User::all();
+        return view('confirm',compact('users'));
+    }
+
     public function checkapp(Request $request)
     {
         //TODO :: Grab value from DB and populate here

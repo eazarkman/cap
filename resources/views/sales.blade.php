@@ -94,7 +94,7 @@
                 </div>
 
                 <script src="https://checkout-sandbox.getbread.com/bread.js" data-api-key="6e60f090-d169-447d-939b-2cb54941d7aa"></script>
-                <form id="bread-checkout-form" action="/confirm" method="POST">
+                <form id="bread-checkout-form" action="{{ url('/confirm') }}" method="POST">
                     <div id="bread-checkout-btn" data-bread-default-size="true"></div>
                     <input type="hidden" name="fullname" id="funame">
                     <input type="hidden" name="address" id="address">

@@ -19,6 +19,7 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index');
 Route::get('/sales', 'SalesController@index');
+Route::get('/confirm', 'SalesController@confirm');
 Route::get('/checkapp', 'SalesController@checkapp');
 Route::get('/expense', 'ExpenseController@index');
 Route::get('/users', 'UserController@index');
