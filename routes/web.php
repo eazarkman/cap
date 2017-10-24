@@ -27,3 +27,4 @@ Route::get('/fetchuser', 'UserController@fetchuser');
 Route::get('/destroyuser', 'UserController@deleteuser');
 Route::post('/updateuser', 'UserController@updateuser');
 Route::post('/user/register', 'UserController@register');
+Route::post('/confirm', 'SalesController@confirm');
