@@ -36,10 +36,8 @@ class SalesController extends Controller
 
     public function checkapp(Request $request)
     {
-        $applications = DB::connection('defi')->select('select * from Customers where app_id = :id', ['id' => $request->get('appnumber')]);
+        $applications = DB::connection('defi')->select('select * from Customers where appid = :id', ['id' => $request->get('appnumber')]);
 
-        //TODO :: Grab value from DB and populate here
-        // TODO :: Conditional check
         $fullname = $address = $city = $state = $zip = $phone = $email = '';
         foreach ($applications as $application)
         {
