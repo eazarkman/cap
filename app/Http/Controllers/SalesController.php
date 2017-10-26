@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
-
+use DB;
 class SalesController extends Controller
 {
     /**
@@ -36,16 +36,36 @@ class SalesController extends Controller
 
     public function checkapp(Request $request)
     {
+        $applications = DB::connection('defi')->select('select * from Customers where app_id = :id', ['id' => $request->get('appnumber')]);
+
         //TODO :: Grab value from DB and populate here
-       // TODO :: Conditional check
-        $result = ['funame' => 'Any Thing'
-                    , 'address'=> '123 Main St'
+        // TODO :: Conditional check
+        $fullname = $address = $city = $state = $zip = $phone = $email = '';
+        foreach ($applications as $application)
+        {
+           $fullname = $application->firstname." ".$application->lastname;
+           $address = $application->street;
+           $city = $application->city;
+           $state = $application->state;
+           $zip = $application->zipcode;
+           if($application->homephone){
+               $phone = $application->homephone;
+           }elseif ($application->workphone){
+               $phone = $application->workphone;
+           }else{
+               $phone = $application->varphone;
+           }
+           $email = $application->email;
+        }
+
+        $result = ['funame' => $fullname?$fullname:""
+                    , 'address'=> $address?$address:""
                     , 'address2'=>''
-                    , 'zip'=>'90015'
-                    , 'city'=>'Los Angeles'
-                    , 'state' => 'CA'
-                    , 'phone' => '2589631254'
-                    , 'email' => 'any@thing.com'
+                    , 'zip'=>$zip?$zip:""
+                    , 'city'=>$city?$city:""
+                    , 'state' => $state?$state:""
+                    , 'phone' => $phone?$phone:""
+                    , 'email' => $email?$email:""
                     , 'source' => $request->get('source')
                 ];
 
