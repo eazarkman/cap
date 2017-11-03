@@ -30,7 +30,7 @@
             </li>
             @endif
             <li class="treeview">
-                <a href="{{ url('/sales') }}"><i class="ion ion-bag"></i>Credit Sale</a>
+                <a href="{{ url('/sales') }}"><i class="ion ion-bag"></i>Credit Application</a>
             </li>
         </ul>
     </section>

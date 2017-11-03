@@ -1,6 +1,5 @@
 @extends('layouts.page')
 @section('content')
-
        <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
@@ -8,6 +7,9 @@
                 <h1>
                     Credit Application
                 </h1>
+            </section>
+            <section class="content">
+                @include('layouts.appform')
             </section>
             <section class="content">
                 <div class="row" style="margin-bottom: 15px;">
