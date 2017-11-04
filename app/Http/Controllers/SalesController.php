@@ -55,12 +55,12 @@ class SalesController extends Controller
            $city = $application->city;
            $state = $application->state;
            $zip = $application->zipcode;
-           if($application->homephone){
-               $phone = $application->homephone;
-           }elseif ($application->workphone){
-               $phone = $application->workphone;
-           }else{
+           if($application->varphone){
                $phone = $application->varphone;
+           }elseif ($application->homephone){
+               $phone = $application->homephone;
+           }else{
+               $phone = $application->workphone;
            }
            $email = $application->email;
         }
