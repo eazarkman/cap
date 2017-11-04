@@ -38,7 +38,14 @@ class SalesController extends Controller
 
     public function checkapp(Request $request)
     {
-        $applications = DB::connection('defi')->select('select * from Customers where id = :id', ['id' => $request->get('appnumber')]);
+        if($request->exists('customer_id')){
+            $applications = DB::connection('defi')->select('select * from Customers where custid = :id', ['id' => $request->get('customer_id')]);
+            if(count($applications)==0){
+                return response()->json(['showapplicaiton'=>true]);
+            }
+        }else {
+            $applications = DB::connection('defi')->select('select * from Customers where id = :id', ['id' => $request->get('appnumber')]);
+        }
 
         $fullname = $address = $city = $state = $zip = $phone = $email = '';
         foreach ($applications as $application)
@@ -58,15 +65,16 @@ class SalesController extends Controller
            $email = $application->email;
         }
 
-        $result = ['funame' => $fullname?$fullname:""
-                    , 'address'=> $address?$address:""
+        $result = ['funame' => trim($fullname)?$fullname:"FirstName LastName"
+                    , 'address'=> trim($address)?$address:"123 Please fill"
                     , 'address2'=>''
-                    , 'zip'=>$zip?$zip:""
-                    , 'city'=>$city?$city:""
-                    , 'state' => $state?$state:""
-                    , 'phone' => $phone?$phone:""
+                    , 'zip'=>$zip?$zip:"12345"
+                    , 'city'=>$city?$city:"City Please"
+                    , 'state' => $state?$state:"CA"
+                    , 'phone' => $phone?$phone:"0000000000"
                     , 'email' => $email?$email:""
                     , 'source' => $request->get('source')
+                    , 'showapplicaiton' => false
                 ];
 
         //$result = ['status'=>'not found'];

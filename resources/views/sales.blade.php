@@ -8,11 +8,48 @@
                     Credit Application
                 </h1>
             </section>
-            <section class="content" id="credit_application">
+            <section class="content" id="customer_check">
+                <div class="box box-primary">
+                    <div class="col-md-6">
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label for="exampleInputFile">Are you Starworld Custoemr?</label>
+                                <select name="existing_customer" id="existing_customer"  class="form-control select2" style="width: 100%;" onchange="showcustomernumber()">
+                                    <option value="">Select</option>
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}" style="display: none" id="customerNumber">
+                                <label for="name" class="col-md-4 control-label">Customer Number: </label>
+                                <input id="customer_number" type="text" class="form-control" name="customer_number" value="" required autofocus>
+                            </div>
+
+                            <div class="form-group" id="credit_source" style="display: none;">
+                                <div class="form-group">
+                                    <label for="equity" class="col-md-4 control-label">Source </label>
+                                    <select class="form-control" name="admin" id="customer_source">
+                                        <option value="sw">Starworld</option>
+                                        <option value="bread">Bread</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info pull-right" onclick="return checkCustomer()">Check</button>
+                    </div>
+                </div>
+
+            </section>
+            <section class="content" id="credit_application" style="display:none;">
                 @include('layouts.appform')
             </section>
             <section class="content" id="checkout" style="display: none">
-                <div class="row" style="margin-bottom: 15px;">
+                <div class="row" style="margin-bottom: 15px;" id="app_id_check">
                     <div class="col-xs-6" style="margin-top: 15px;">
                         <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
                             <label for="name" class="col-md-4 control-label">App Id</label>
@@ -202,7 +239,41 @@
                   alert("Please atleast one item to cart before checkout");
               }
           }
-
-
+          function showcustomernumber() {
+              if($("#existing_customer").val()=='yes'){
+                  $("#customerNumber").show('slow');
+                  $("#credit_source").show('slow');
+              }else{
+                  $("#customer_check").hide();
+                  $("#credit_application").show();
+              }
+          }
+          function checkCustomer() {
+              $.get('checkapp', {customer_id: $("#customer_number").val(),source: $("#customer_source").val()},
+                      function(data) {
+                          if(data.status=='not found'){
+                              alert('No Application Found !!');
+                          } else if (data.showapplicaiton){
+                              alert('No Data found for the customer number please fill our new application');
+                              $("#customer_check").hide();
+                              $("#credit_application").show();
+                          }else if(data.source == 'bread') {
+                              $("#checkout").show();
+                              $("#app_id_check").hide();
+                              $('#funame').val(data.funame);
+                              $('#address').val(data.address);
+                              $('#address2').val(data.address2);
+                              $('#zip').val(data.zip);
+                              $('#city').val(data.city);
+                              $('#state').val(data.state);
+                              $('#phone').val(data.phone);
+                              $('#email').val(data.email);
+                              $('#shoppingcart').show();
+                          }else{
+                              // Proper Alert Message for the usser
+                              alert('Applicaiton matches Star world credit criteria. No further action required. Please contact finance department for more update');
+                          }
+                      });
+          }
        </script>
 @endsection
