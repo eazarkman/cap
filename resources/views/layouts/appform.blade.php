@@ -1,4 +1,5 @@
 <form id="frmApplication" method="post" enctype="multipart/form-data">
+    {{ csrf_field() }}
     <div class="box box-primary accordian_step" id="step1">
         <div class="col-md-6">
             <div class="box-body">
@@ -757,6 +758,16 @@
         return false;
     }
     function submitApplication() {
-        alert('Submitting the application which will just saves the information')
+        $.post('saveapp', $('#frmApplication').serialize(),
+                function(data) {
+                    if(data.success){
+                        $("#app_id").val(data.appId);
+                        $("#credit_application").hide();
+                        $("#checkout").show();
+                    }else{
+                        alert(data.msg);
+                    }
+                });
+        return false;
     }
 </script>

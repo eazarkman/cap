@@ -28,3 +28,4 @@ Route::get('/destroyuser', 'UserController@deleteuser');
 Route::post('/updateuser', 'UserController@updateuser');
 Route::post('/user/register', 'UserController@register');
 Route::post('/confirm', 'SalesController@confirm');
+Route::post('/saveapp', 'SalesController@saveapp');

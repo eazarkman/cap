@@ -8,10 +8,10 @@
                     Credit Application
                 </h1>
             </section>
-            <section class="content">
+            <section class="content" id="credit_application">
                 @include('layouts.appform')
             </section>
-            <section class="content">
+            <section class="content" id="checkout" style="display: none">
                 <div class="row" style="margin-bottom: 15px;">
                     <div class="col-xs-6" style="margin-top: 15px;">
                         <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
