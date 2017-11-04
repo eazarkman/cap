@@ -6,6 +6,7 @@ use App\User;
 use App\Storis;
 use Illuminate\Http\Request;
 use DB;
+use Illuminate\Support\Facades\Crypt;
 class SalesController extends Controller
 {
     /**
@@ -86,6 +87,9 @@ class SalesController extends Controller
                     return response()->json(['success' => false, 'error' => true, 'msg' => $customer_response['message']]);
                 }
             }
+        }
+        if (isset($insert_value['ssn'])){
+            $insert_value['ssn'] = Crypt::encryptString($insert_value['ssn']);
         }
         if (isset($insert_value['dob'])){
             $insert_value['dob'] = date('Y-m-d',strtotime($insert_value['dob']));
