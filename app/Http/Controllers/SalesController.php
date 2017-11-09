@@ -38,21 +38,46 @@ class SalesController extends Controller
 
     public function checkapp(Request $request)
     {
+        $fullname = $address = $city = $state = $zip = $phone = $email = $address2 = '';
         if($request->exists('customer_id')){
             $applications = DB::connection('defi')->select('select * from Customers where custid = :id', ['id' => $request->get('customer_id')]);
             if(count($applications)==0){
-                return response()->json(['showapplicaiton'=>true]);
+                $storis = new Storis();
+                $customer_response = $storis->getCustomer($request->get('customer_id'));
+                if($customer_response['success']){
+                    $customer = $customer_response['customer'];
+                    $fullname = $customer['fullName'];
+                    $address = $customer['billingAddress']['address1'];
+                    $address2 = $customer['billingAddress']['address2'];
+                    $city = $customer['billingAddress']['city'];
+                    $state = $customer['billingAddress']['state'];
+                    $zip = $customer['billingAddress']['zipCode'];
+                    foreach ($customer['phones'] as $phonearray){
+                        $phnumber = '';
+                        if($phonearray['phoneType']=='Mobile'){
+                            $phnumber = $phonearray['number'];
+                        }elseif($phonearray['phoneType']=='Home'){
+                            $phnumber = $phonearray['number'];
+                        }else{
+                            $phnumber = $phonearray['number'];
+                        }
+                    }
+                    $phone = $phnumber;
+                    $email = $customer['emailAddress'];
+                }else {
+                    return response()->json(['showapplicaiton' => true]);
+                }
             }
         }else {
             $applications = DB::connection('defi')->select('select * from Customers where id = :id', ['id' => $request->get('appnumber')]);
         }
 
-        $fullname = $address = $city = $state = $zip = $phone = $email = '';
         foreach ($applications as $application)
         {
            $fullname = $application->firstname." ".$application->lastname;
            $address = $application->street_number." ".$application->street_name." ".$application->street_type;
-           $city = $application->city;
+           $address2 = $application->apt_number;
+            $city = $application->city;
            $state = $application->state;
            $zip = $application->zipcode;
            if($application->varphone){
@@ -63,11 +88,12 @@ class SalesController extends Controller
                $phone = $application->workphone;
            }
            $email = $application->email;
+
         }
 
         $result = ['funame' => trim($fullname)?$fullname:"FirstName LastName"
                     , 'address'=> trim($address)?$address:"123 Please fill"
-                    , 'address2'=>''
+                    , 'address2'=>$address2
                     , 'zip'=>$zip?$zip:"12345"
                     , 'city'=>$city?$city:"City Please"
                     , 'state' => $state?$state:"CA"
