@@ -127,7 +127,7 @@
                             <button type="button" class="btn btn-block btn-info btn-lg" onclick="deleteRow()">Remove From Cart</button>
                         </div>
                         <div class="col-xs-2">
-                            <button type="button" class="btn btn-block btn-info btn-lg" onclick="getBreadCheckout()">Checkout</button>
+                            <button type="button" class="btn btn-block btn-info btn-lg" onclick="getBreadCheckout()">Continue to Checkout</button>
                         </div>
                     </div>
                 </div>
@@ -233,12 +233,48 @@
                           email: $('#email').val()
                       }
                   };
-                  console.log(opts);
+                  opts.calculateTax = function(shippingContact, callback) {
+                      var total = 0;
+                      $.each(items, function( index, value ) {
+                          //console.log( index + ": " + value );
+                          total = parseFloat(parseFloat(value.price)/100)*parseInt(value.quantity);
+                      });
+                      total = parseFloat(parseFloat(total*100)*0.09);
+                      callback(null, total);
+                  };
+                  opts.onCustomerClose = function(err, custData) {
+                      if (err !== null) {
+                          console.error("An error occurred getting customer close data.");
+                          return;
+                      }
+                      var customerEmail = custData.email;
+                      var qualState     = custData.state;
+                      switch (qualState) {
+                          case 'PREQUALIFIED':
+                              console.log(customerEmail + " was prequalified for financing.");
+                              break;
+                          case 'PARTIALLY_PREQUALIFIED':
+                              console.log(customerEmail + " was partially prequalified for financing.");
+                              break;
+                          case 'NOT_PREQUALIFIED':
+                              console.log(customerEmail + " was not prequalified for financing."); // Here to add conditional check to send this applicaiton to Progressive
+                              break;
+                          case 'ABANDONED':
+                              if (customerEmail === undefined || customerEmail === null) {
+                                  console.log("Unknown customer abandoned their prequalification attempt.");
+                              } else {
+                                  console.log(customerEmail + " abandoned their prequalification attempt.");
+                              }
+                              break;
+                      }
+                  }
                   bread.checkout(opts);
+
               }else{
                   alert("Please atleast one item to cart before checkout");
               }
           }
+
           function showcustomernumber() {
               if($("#existing_customer").val()=='yes'){
                   $("#customerNumber").show('slow');
