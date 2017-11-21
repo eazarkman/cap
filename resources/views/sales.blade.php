@@ -131,7 +131,7 @@
                         </div>
                     </div>
                 </div>
-                kWPNmddywpY4DVCU
+
                 <script src="https://checkout.getbread.com/bread.js" data-api-key="02f47c08-5340-4965-b107-e62535231605"></script>
                 <form id="bread-checkout-form" action="{{ url('/confirm') }}" method="POST">
                     {{ csrf_field() }}
