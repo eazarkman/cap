@@ -13,7 +13,7 @@
                     <div class="col-md-6">
                         <div class="box-body">
                             <div class="form-group">
-                                <label for="exampleInputFile">Are you Starworld Custoemr?</label>
+                                <label for="exampleInputFile">Are you Starworld Customer?</label>
                                 <select name="existing_customer" id="existing_customer"  class="form-control select2" style="width: 100%;" onchange="showcustomernumber()">
                                     <option value="">Select</option>
                                     <option value="yes">Yes</option>
