@@ -1,5 +1,14 @@
 <header class="main-header">
     <!-- Logo -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-88998418-3"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-88998418-3');
+    </script>
     <a href="{{ url('/home') }}" class="logo">
         <!-- mini logo for sidebar mini 50x50 pixels -->
         <span class="logo-mini"><img src="//ec2a-css.imgix.net/cid31/css/10002/logo.png" alt="Star World Logo" height="35" width="176"></span>
