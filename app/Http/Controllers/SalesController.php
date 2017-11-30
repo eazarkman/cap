@@ -6,6 +6,7 @@ use App\User;
 use App\Storis;
 use Illuminate\Http\Request;
 use DB;
+use Auth;
 use Illuminate\Support\Facades\Crypt;
 class SalesController extends Controller
 {
@@ -27,7 +28,7 @@ class SalesController extends Controller
     public function index()
     {
         $users = User::all();
-        return view('sales',compact('users'));
+        return view('credit',compact('users'));
     }
 
     public function confirm()
@@ -40,6 +41,17 @@ class SalesController extends Controller
     {
         $fullname = $address = $city = $state = $zip = $phone = $email = $address2 = '';
         if($request->exists('customer_id')){
+            if ( $request->get('source') == 'bread' && $request->get('language') != 'english' ){
+                return response()->json(['success'=>false,'status'=>'not supported','error'=>true,'msg'=>'Bread only prefer english language']);
+            }
+            $insert_val = [
+                'customer_id'=>$request->get('customer_id'),
+                'source'=>$request->get('source'),
+                'language'=>$request->get('language'),
+                'username'=>Auth::user()->email,
+                'admin_name'=>Auth::user()->name
+            ];
+            $insertedId = DB::table('log')->insertGetId($insert_val);
             $applications = DB::connection('defi')->select('select * from Customers where custid = :id', ['id' => $request->get('customer_id')]);
             if(count($applications)==0){
                 $storis = new Storis();
@@ -133,6 +145,32 @@ class SalesController extends Controller
             return response()->json(['success'=>true,'error'=>false,'appId'=>$inserted_record,'msg'=>'Record Successfully saved. Id : '.$inserted_record]);
         }else{
             return response()->json(['success'=>false,'error'=>true,'msg'=>'Customer Data did not get saved']);
+        }
+    }
+
+    public function getorder(Request $request){
+        $storis = new Storis();
+        $order_response = $storis->getOrder($request->get('order_id'),$request->get('customer_id'));
+        if(is_array($order_response)) {
+            if(isset($order_response['success'])&&$order_response['success']) {
+                $order = $order_response['order'];
+                $items = [];
+                foreach ($order['lineItems'] as $item){
+                    $items[] = [
+                        'name'=>$item['description'],
+                        'price'=> $item['price']*100,
+                        'sku'=> $item['id'],
+                        'quantity'=> $item['quantity'],
+                        'detailUrl'=> '[REPLACEMEWITHAREALURL]'
+                    ] ;
+                }
+                $response = ['items'=>$items,'tax'=>$order['orderTotals']['tax']];
+                return response()->json(['success' => true, 'error' => false, 'msg' => '','orderInfo'=>$response]);
+            }else{
+                if(isset($order_response['message'])) {
+                    return response()->json(['success' => false, 'error' => true, 'msg' => $order_response['message']]);
+                }
+            }
         }
     }
     //TODO :: This function can be used to validate and prompt as suggestion but not have effect on the source

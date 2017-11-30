@@ -97,4 +97,39 @@ class Storis extends Model
             }
         }
     }
+
+    public function getOrder($order_id,$customer_id){
+        $url = $this->storis_url.'/'.$this->storis_token.'/orders/'.$order_id.',1?customerId='.$customer_id;
+        $headers[] = 'content-type: application/json';
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+        $response = curl_exec($ch);
+
+        if (!$response)
+        {
+            return false;
+        }
+
+        $result = json_decode($response,true);
+
+        if(is_array($result)){
+            if(isset($result['salesOrder'])){
+                //return $result['customer'];
+                return [
+                    'success' => true,
+                    'error'  => false,
+                    'msg' => 'Successfully got the record',
+                    'order' => $result['salesOrder']
+                ];
+            }elseif (isset($result['message'])){
+                return [
+                    'success' => false,
+                    'error'  => true,
+                    'message' => $result['message']
+                ];
+            }
+        }
+    }
 }
