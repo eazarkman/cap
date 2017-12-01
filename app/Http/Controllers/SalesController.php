@@ -41,9 +41,7 @@ class SalesController extends Controller
     {
         $fullname = $address = $city = $state = $zip = $phone = $email = $address2 = '';
         if($request->exists('customer_id')){
-            if ( $request->get('source') == 'bread' && $request->get('language') != 'english' ){
-                return response()->json(['success'=>false,'status'=>'not supported','error'=>true,'msg'=>'Bread only prefer english language']);
-            }
+
             $insert_val = [
                 'customer_id'=>$request->get('customer_id'),
                 'source'=>$request->get('source'),
@@ -52,6 +50,11 @@ class SalesController extends Controller
                 'admin_name'=>Auth::user()->name
             ];
             $insertedId = DB::table('log')->insertGetId($insert_val);
+
+            if ( $request->get('source') == 'bread' && $request->get('language') != 'english' ){
+                return response()->json(['success'=>false,'status'=>'not supported','error'=>true,'msg'=>'Bread only prefer english language']);
+            }
+
             $applications = DB::connection('defi')->select('select * from Customers where custid = :id', ['id' => $request->get('customer_id')]);
             if(count($applications)==0){
                 $storis = new Storis();

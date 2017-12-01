@@ -83,7 +83,7 @@
                             <div class="col-xs-4" id="storis_order_btn">
                                 <button type="button" class="btn btn-block btn-info btn-lg" onclick="checkOrder()">Get Order</button>
                             </div>
-                            <div class="col-xs-4"  id="continue_checkout" style="display: none">
+                            <div class="col-xs-6"  id="continue_checkout" style="display: none">
                                 <button type="button" class="btn btn-block btn-info btn-lg" onclick="getBreadCheckout()">Continue to Checkout</button>
                             </div>
                         </div>
