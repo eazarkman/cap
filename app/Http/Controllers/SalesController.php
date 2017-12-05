@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\Storis;
+use App\Bread;
 use Illuminate\Http\Request;
 use DB;
 use Auth;
@@ -175,6 +176,10 @@ class SalesController extends Controller
                 }
             }
         }
+    }
+    public function authorizebread(Request $request){
+        $bread = new Bread();
+        return $bread->authorizeTransaction($request->get('transaction_id'),$request->get('order_id'));
     }
     //TODO :: This function can be used to validate and prompt as suggestion but not have effect on the source
     protected function getSource($score){

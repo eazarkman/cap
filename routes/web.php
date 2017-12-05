@@ -30,3 +30,4 @@ Route::post('/user/register', 'UserController@register');
 Route::post('/confirm', 'SalesController@confirm');
 Route::post('/saveapp', 'SalesController@saveapp');
 Route::get('/getorder', 'SalesController@getorder');
+Route::get('/authorizebread', 'SalesController@authorizebread');

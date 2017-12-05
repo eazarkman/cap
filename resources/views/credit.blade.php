@@ -200,6 +200,25 @@
                               break;
                       }
                   }
+                  opts.done = function(err, tx_token) {
+                      if (err) {
+                          alert("There was an error: " + err);
+                          return;
+                      }
+                      if (tx_token !== undefined) {
+                          $.get('authorizebread', {order_id:$("#storis_order_number").val(),transaction_id:tx_token},
+                                  function(data) {
+                                      if(data.success){
+                                          alert(data.message)
+                                      }else{
+                                          alert(data.message);
+                                      }
+                                      window.location.href = "{{ url('/sales') }}";
+                                  });
+                          return false;
+                      }
+                      return;
+                  };
                   bread.checkout(opts);
 
               }else{
