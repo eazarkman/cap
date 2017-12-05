@@ -179,7 +179,7 @@ class SalesController extends Controller
     }
     public function authorizebread(Request $request){
         $bread = new Bread();
-        return $bread->authorizeTransaction($request->get('transaction_id'),$request->get('order_id'));
+        return response()->json($bread->authorizeTransaction($request->get('transaction_id'),$request->get('order_id')));
     }
     //TODO :: This function can be used to validate and prompt as suggestion but not have effect on the source
     protected function getSource($score){
