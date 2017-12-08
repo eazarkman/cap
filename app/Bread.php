@@ -62,9 +62,15 @@ class Bread extends Model
                     return [
                         'success' => true,
                         'error'  => false,
-                        'msg' => 'Successfully authorized the transaction'
+                        'message' => 'Successfully authorized the transaction'
                     ];
                 }
+            }else{
+                return [
+                    'success' => false,
+                    'error'  => true,
+                    'message' => 'An unexpected error occur'
+                ];
             }
 
         }
