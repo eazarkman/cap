@@ -78,7 +78,7 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    <img src="//ec2a-css.imgix.net/cid31/css/10002/logo.png" alt="Star World Logo" height="66" width="280">
+                    <img src="http://starworld.us/pub/media/logo/stores/1/logo.png" alt="Star World Logo" height="66" width="280">
                 </div>
 
             </div>

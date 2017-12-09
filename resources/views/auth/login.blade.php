@@ -5,7 +5,7 @@
     <div class="login-logo">
         <a href="{{ url('/home') }}" class="logo">
             <!-- logo for regular state and mobile devices -->
-            <span class="logo-lg"><img src="//ec2a-css.imgix.net/cid31/css/10002/logo.png" alt="Star World Logo" height="35" width="166"></span>
+            <span class="logo-lg"><img src="http://starworld.us/pub/media/logo/stores/1/logo.png" alt="Star World Logo" height="35" width="166"></span>
         </a>
     </div>
 </div>

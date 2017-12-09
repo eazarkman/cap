@@ -11,9 +11,9 @@
     </script>
     <a href="{{ url('/home') }}" class="logo">
         <!-- mini logo for sidebar mini 50x50 pixels -->
-        <span class="logo-mini"><img src="//ec2a-css.imgix.net/cid31/css/10002/logo.png" alt="Star World Logo" height="35" width="176"></span>
+        <span class="logo-mini"><img src="http://starworld.us/pub/media/logo/stores/1/logo.png" alt="Star World Logo" height="35" width="176"></span>
         <!-- logo for regular state and mobile devices -->
-        <span class="logo-lg"><img src="//ec2a-css.imgix.net/cid31/css/10002/logo.png" alt="Star World Logo" height="35" width="166"></span>
+        <span class="logo-lg"><img src="http://starworld.us/pub/media/logo/stores/1/logo.png" alt="Star World Logo" height="35" width="166"></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
