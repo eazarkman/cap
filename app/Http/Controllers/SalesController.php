@@ -164,7 +164,8 @@ class SalesController extends Controller
                         'name'=>$item['description'],
                         'price'=> $item['price']*100,
                         'sku'=> $item['id'],
-                        'quantity'=> $item['quantity'],
+                        //'quantity'=> $item['quantity'],
+                        'quantity'=> 1,
                         'detailUrl'=> '[REPLACEMEWITHAREALURL]'
                     ] ;
                 }
