@@ -169,7 +169,27 @@ class SalesController extends Controller
                         'detailUrl'=> '[REPLACEMEWITHAREALURL]'
                     ] ;
                 }
-                $response = ['items'=>$items,'tax'=>$order['orderTotals']['tax']];
+                if ($order['orderTotals']['delivery']>0){
+                    $items[] = [
+                        'name'=>'Delivery Charge',
+                        'price'=> $order['orderTotals']['delivery']*100,
+                        'sku'=> 'delivery',
+                        //'quantity'=> $item['quantity'],
+                        'quantity'=> 1,
+                        'detailUrl'=> '[REPLACEMEWITHAREALURL]'
+                    ];
+                }
+                if ($order['orderTotals']['install']>0){
+                    $items[] = [
+                        'name'=>'Installation Charge',
+                        'price'=> $order['orderTotals']['install']*100,
+                        'sku'=> 'installation',
+                        //'quantity'=> $item['quantity'],
+                        'quantity'=> 1,
+                        'detailUrl'=> '[REPLACEMEWITHAREALURL]'
+                    ];
+                }
+                $response = ['items'=>$items,'tax'=>$order['orderTotals']['tax'],'delivery'=>$order['orderTotals']['delivery']];
                 return response()->json(['success' => true, 'error' => false, 'msg' => '','orderInfo'=>$response]);
             }else{
                 if(isset($order_response['message'])) {
