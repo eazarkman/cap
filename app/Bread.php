@@ -26,7 +26,7 @@ class Bread extends Model
         $merchantJSON = json_encode(['merchantOrderId'=>$order_id,'type'=>'authorize']);
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getUrl()."/transactions/actions/".$transaction_id,
+            CURLOPT_URL => $this->getUrl()."transactions/actions/".$transaction_id,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => "",
             CURLOPT_MAXREDIRS => 10,
