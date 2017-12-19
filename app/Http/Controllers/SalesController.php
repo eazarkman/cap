@@ -162,10 +162,10 @@ class SalesController extends Controller
                 foreach ($order['lineItems'] as $item){
                     $items[] = [
                         'name'=>$item['description'],
-                        'price'=> $item['price']*100,
+                        'price'=> round($item['price']/$item['quantity'],2)*100,
                         'sku'=> $item['id'],
-                        //'quantity'=> $item['quantity'],
-                        'quantity'=> 1,
+                        'quantity'=> $item['quantity'],
+                        //'quantity'=> 1,
                         'detailUrl'=> '[REPLACEMEWITHAREALURL]'
                     ] ;
                 }
@@ -174,7 +174,6 @@ class SalesController extends Controller
                         'name'=>'Delivery Charge',
                         'price'=> $order['orderTotals']['delivery']*100,
                         'sku'=> 'delivery',
-                        //'quantity'=> $item['quantity'],
                         'quantity'=> 1,
                         'detailUrl'=> '[REPLACEMEWITHAREALURL]'
                     ];
@@ -184,7 +183,6 @@ class SalesController extends Controller
                         'name'=>'Installation Charge',
                         'price'=> $order['orderTotals']['install']*100,
                         'sku'=> 'installation',
-                        //'quantity'=> $item['quantity'],
                         'quantity'=> 1,
                         'detailUrl'=> '[REPLACEMEWITHAREALURL]'
                     ];
