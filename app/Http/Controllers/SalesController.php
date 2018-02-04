@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Storis;
 use App\Bread;
+use App\Customer;
 use Illuminate\Http\Request;
 use DB;
 use Auth;
@@ -41,8 +42,9 @@ class SalesController extends Controller
     public function checkapp(Request $request)
     {
         $fullname = $address = $city = $state = $zip = $phone = $email = $address2 = '';
+        $customer = new Customer();
+        $storis = new Storis();
         if($request->exists('customer_id')){
-
             $insert_val = [
                 'customer_id'=>$request->get('customer_id'),
                 'source'=>$request->get('source'),
@@ -51,76 +53,24 @@ class SalesController extends Controller
                 'admin_name'=>Auth::user()->name
             ];
             $insertedId = DB::table('log')->insertGetId($insert_val);
-
             if ( $request->get('source') == 'bread' && $request->get('language') != 'english' ){
                 return response()->json(['success'=>false,'status'=>'not supported','error'=>true,'msg'=>'Bread only prefer english language']);
             }
+           $customer_data = $customer->getCustomerData(null,$request->get('customer_id'),$request->get('source'),$storis);
 
-            $applications = DB::connection('defi')->select('select * from Customers where custid = :id', ['id' => $request->get('customer_id')]);
-            if(count($applications)==0){
-                $storis = new Storis();
-                $customer_response = $storis->getCustomer($request->get('customer_id'));
-                if($customer_response['success']){
-                    $customer = $customer_response['customer'];
-                    $fullname = $customer['fullName'];
-                    $address = $customer['billingAddress']['address1'];
-                    $address2 = $customer['billingAddress']['address2'];
-                    $city = $customer['billingAddress']['city'];
-                    $state = $customer['billingAddress']['state'];
-                    $zip = $customer['billingAddress']['zipCode'];
-                    foreach ($customer['phones'] as $phonearray){
-                        $phnumber = '';
-                        if($phonearray['phoneType']=='Mobile'){
-                            $phnumber = $phonearray['number'];
-                        }elseif($phonearray['phoneType']=='Home'){
-                            $phnumber = $phonearray['number'];
-                        }else{
-                            $phnumber = $phonearray['number'];
-                        }
-                    }
-                    $phone = $phnumber;
-                    $email = $customer['emailAddress'];
-                }else {
-                    return response()->json(['showapplicaiton' => true]);
-                }
-            }
         }else {
-            $applications = DB::connection('defi')->select('select * from Customers where id = :id', ['id' => $request->get('appnumber')]);
+            $customer_data = $customer->getCustomerData($request->get('appnumber'),null,$request->get('source'),$storis);
         }
-
-        foreach ($applications as $application)
-        {
-           $fullname = $application->firstname." ".$application->lastname;
-           $address = $application->street_number." ".$application->street_name." ".$application->street_type;
-           $address2 = $application->apt_number;
-            $city = $application->city;
-           $state = $application->state;
-           $zip = $application->zipcode;
-           if($application->varphone){
-               $phone = $application->varphone;
-           }elseif ($application->homephone){
-               $phone = $application->homephone;
-           }else{
-               $phone = $application->workphone;
-           }
-           $email = $application->email;
-
+        if($customer_data['success']) {
+            if (isset($customer_data['storis'])) {
+                return response()->json($customer_data['result']);
+            } else {
+                return response()->json($customer_data['bread_package']);
+            }
+        }else{
+            return response()->json($customer_data);
         }
-
-        $result = ['funame' => trim($fullname)?$fullname:"FirstName LastName"
-                    , 'address'=> trim($address)?$address:"123 Please fill"
-                    , 'address2'=>$address2
-                    , 'zip'=>$zip?$zip:"12345"
-                    , 'city'=>$city?$city:"City Please"
-                    , 'state' => $state?$state:"CA"
-                    , 'phone' => $phone?$phone:"0000000000"
-                    , 'email' => $email?$email:""
-                    , 'source' => $request->get('source')
-                    , 'showapplicaiton' => false
-                ];
-
-        //$result = ['status'=>'not found'];
-        return response()->json($result);
+        //return response()->json($result);
     }
 
     public function saveapp(Request $request)
