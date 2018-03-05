@@ -4,18 +4,25 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use DB;
+use App\Storis;
+use League\Flysystem\Exception;
 
 class Customer extends Model
 {
-    public function getCustomerData($app_id = null,$customer_id = '' , $source, $storis){
+    public function getCustomerData($app_id = null,$customer_id = '' , $source){
+        $storis = new Storis();
         if(!$app_id && !$customer_id){
             return ['success'=>false, 'error'=>true,'msg'=>'Please provide either customer id or app id'];
         }
         if($app_id){
-            $applications = DB::connection('defi')->select('select * from customer where app_id = :id order by id DESC limit 1', ['id' => $app_id]);
+            $applications = DB::connection()->select('select * from customer where app_id = :id order by id DESC limit 1', ['id' => $app_id]);
         }elseif ($customer_id){
-            $applications = DB::connection('defi')->select('select * from customer where storis_cust_id = :id  order by id DESC limit 1', ['id' => $customer_id]);
+            $applications = DB::connection()->select('select * from customer where storis_cust_id = :id  order by id DESC limit 1', ['id' => $customer_id]);
             if(count($applications)==0){
+                if($source == 'progressive'){
+                    return ['success'=>false, 'error'=>true,'additional_info'=>true,'employer_info'=>true,'bank_info'=>true,'msg'=>'Progressive return'];
+                }
+
                 $customer_response = $storis->getCustomer($customer_id);
                 if($customer_response['success']){
                     $customer = $customer_response['customer'];
@@ -38,6 +45,8 @@ class Customer extends Model
                     $phone = $phnumber;
                     $email = $customer['emailAddress'];
                     $result = ['funame' => trim($fullname)?$fullname:"FirstName LastName"
+                        , 'first_name'=> trim($customer['firstName'])?$customer['firstName']:"First Name"
+                        , 'last_name'=> trim($customer['lastName'])?$customer['lastName']:"Last Name"
                         , 'address'=> trim($address)?$address:"123 Please fill"
                         , 'address2'=>$address2
                         , 'zip'=>$zip?$zip:"12345"
@@ -48,6 +57,38 @@ class Customer extends Model
                         , 'source' => $source
                         , 'showapplicaiton' => false
                     ];
+                    try {
+                        $customer_value = ['first_name' => $customer['firstName'],
+                            'last_name' => $customer['lastName'],
+                            'storis_cust_id' => $customer_id,
+                            'email' => $customer['emailAddress']
+                        ];
+                        foreach ($customer['phones'] as $phonearray) {
+                            if ($phonearray['phoneType'] == 'Mobile') {
+                                $customer_value['cell_phone'] = $phonearray['number'];
+                            } elseif ($phonearray['phoneType'] == 'Home') {
+                                $customer_value['home_phone'] = $phonearray['number'];
+                            } else {
+                                $customer_value['work_phone'] = $phonearray['number'];
+                            }
+                        }
+                        $inserted_record = DB::connection()->table('customer')->insertGetId($customer_value);
+                        $address_value = [
+                            'customer_id' => $inserted_record,
+                            'street' => $address,
+                            'apt_number' => $address2,
+                            'city' => $city,
+                            'state' => $state,
+                            'zip' => $zip,
+                            'house_type' => 'CURRENT'
+                        ];
+                        $address_inserted_record = DB::connection()->table('address')->insertGetId($address_value);
+                    }catch (Exception $e){
+                        return ['success'=>false, 'error'=>true,'msg'=>$e->getMessage()];
+                    }
+                    $result['db_customer_id'] = $inserted_record;
+                    $result['db_address_id'] = $address_inserted_record;
+
                     return [
                       'success'=>true,
                       'error'=> false,
@@ -62,12 +103,21 @@ class Customer extends Model
 
         if(count($applications)>0){
             $addresses = $this->getAddresses($applications[0]->id);
+            $employers = $this->getEmployers($applications[0]->id);
+            if($source == 'progressive'){
+                if(count($employers)==0) {
+                    return ['success' => false, 'error' => true, 'additional_info' => true, 'employer_info' => true, 'bank_info' => true, 'msg' => 'Progressive return'];
+                }else{
+                    return ['success' => false, 'error' => true, 'additional_info' => true, 'employer_info' => false, 'bank_info' => true, 'msg' => 'Progressive return'];
+                }
+            }
             return [
                 'success'=>true,
                 'error'=>false,
                 'application'=>$applications[0],
                 'addresses' => $addresses,
-                'employers' => $this->getEmployers($applications[0]->id),
+                'employers' => $employers,
+                'employer_info' => count($employers)?true:false,
                 'bread_package' => $this->makeBreadPackage($applications[0],$addresses,$source),
             ];
         }
@@ -77,28 +127,28 @@ class Customer extends Model
     }
 
     public function getAddresses($customer_id){
-        $addresses = DB::connection('defi')->select('select * from address where customer_id = :id', ['id' => $customer_id]);
+        $addresses = DB::connection()->select('select * from address where customer_id = :id', ['id' => $customer_id]);
         return $addresses;
     }
 
     public function getEmployers($customer_id){
-        $employers = DB::connection('defi')->select('select * from employers where customer_id = :id', ['id' => $customer_id]);
+        $employers = DB::connection()->select('select * from employers where customer_id = :id', ['id' => $customer_id]);
         return $employers;
     }
 
     protected function makeBreadPackage($application, $addresses,$source){
-        $currentAddress = '';
+        $currentAddress = false;
         foreach ($addresses as $address){
             if($address->house_type=='CURRENT'){
                 $currentAddress = $address;
             }
         }
         $fullname = $application->first_name." ".$application->last_name;
-        $address = $currentAddress->street;
-        $address2 = $currentAddress->apt_number;
-        $city = $currentAddress->city;
-        $state = $currentAddress->state;
-        $zip = $currentAddress->zip;
+        $address = $currentAddress?$currentAddress->street:'';
+        $address2 = $currentAddress?$currentAddress->apt_number:'';
+        $city = $currentAddress?$currentAddress->city:'';
+        $state = $currentAddress?$currentAddress->state:'';
+        $zip = $currentAddress?$currentAddress->zip:'';
         if($application->cell_phone){
             $phone = $application->cell_phone;
         }elseif ($application->home_phone){
@@ -108,6 +158,8 @@ class Customer extends Model
         }
         $email = $application->email;
         return ['funame' => trim($fullname)?$fullname:"FirstName LastName"
+            , 'first_name'=> trim($application->first_name)?$application->first_name:""
+            , 'last_name'=> trim($application->last_name)?$application->last_name:""
             , 'address'=> trim($address)?$address:"123 Please fill"
             , 'address2'=>$address2
             , 'zip'=>$zip?$zip:"12345"

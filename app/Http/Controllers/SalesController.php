@@ -6,10 +6,12 @@ use App\User;
 use App\Storis;
 use App\Bread;
 use App\Customer;
+use App\Progressive;
 use Illuminate\Http\Request;
 use DB;
 use Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 class SalesController extends Controller
 {
     /**
@@ -20,6 +22,7 @@ class SalesController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        Log::useDailyFiles(storage_path().'/creditapp/debug.log');
     }
 
     /**
@@ -27,7 +30,7 @@ class SalesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $users = User::all();
         return view('credit',compact('users'));
@@ -56,10 +59,10 @@ class SalesController extends Controller
             if ( $request->get('source') == 'bread' && $request->get('language') != 'english' ){
                 return response()->json(['success'=>false,'status'=>'not supported','error'=>true,'msg'=>'Bread only prefer english language']);
             }
-           $customer_data = $customer->getCustomerData(null,$request->get('customer_id'),$request->get('source'),$storis);
+           $customer_data = $customer->getCustomerData(null,$request->get('customer_id'),$request->get('source'));
 
         }else {
-            $customer_data = $customer->getCustomerData($request->get('appnumber'),null,$request->get('source'),$storis);
+            $customer_data = $customer->getCustomerData($request->get('appnumber'),null,$request->get('source'));
         }
         if($customer_data['success']) {
             if (isset($customer_data['storis'])) {
@@ -145,6 +148,97 @@ class SalesController extends Controller
                 }
             }
         }
+    }
+    public function runProgressive(Request $request){
+        Log::info('Initiated');
+        $data = $request->all();
+        $customer = new Customer();
+        $customer_data = $customer->getCustomerData(null,$request->get('customer_id'),'customer');
+        Log::info('Get Customer Data');
+        Log::info($customer_data);
+        //print_r($customer_data);
+        if($customer_data['success']) {
+            Log::info("Successfully for the customer Data");
+            if (isset($customer_data['storis'])) {
+                return response()->json($customer_data['result']);
+            } else {
+                $app = $customer_data['application'];
+                if($app->home_phone){
+                    $phone = $app->home_phone;
+                }elseif($app->cell_phone){
+                    $phone = $app->cell_phone;
+                }else{
+                    $phone = $app->work_phone;
+                }
+                /*if (count($customer_data['employers'])>0){
+                    $empl = $customer_data['employers'][0];
+                    $data['HireDate'] = $empl->HireDate;
+                    $data['MonthlyGrossIncome'] = $empl->MonthlyGrossIncome?$empl->MonthlyGrossIncome:0;
+                    $data['LastPayDate'] = $empl->LastPayDate;
+                    $data['PayFrequency'] = $empl->PayFrequency;
+                }*/
+                $data = array_merge($data,[
+                    'FirstName'=>$app->first_name
+                    ,'LastName'=>$app->last_name
+                    ,'HomePhone'=>$phone
+                    ,'StreetAddress1'=>$customer_data['bread_package']['address']
+                    ,'StreetAddress2'=>$customer_data['bread_package']['address2']
+                    ,'City'=>$customer_data['bread_package']['city']
+                    ,'State'=>$customer_data['bread_package']['state']
+                    ,'Zip'=>$customer_data['bread_package']['zip']
+                ]);
+            }
+            Log::info($data);
+            Log::info("Staring progressive");
+            $progressive = new Progressive();
+            $validateABA = $progressive->validateABA($data['ABARoutingNumber']);
+            if($validateABA['success']&&$validateABA['result']['IsValid']){
+                Log::info("Valid Bank routing number");
+                if ($request->session()->has('progressive_account_id')) {
+                    Log::info("Account Id from Session");
+                    $account_id = $request->session()->get('progressive_account_id');;
+                    $invoice_request = $progressive->createInvoice($request->get('orderNumber'), $request->get('customer_id'), $account_id);
+                    if($invoice_request['success']){
+                        $request->session()->forget('progressive_account_id');
+                    }
+                    Log::info($invoice_request);
+                    return response()->json($invoice_request);
+                }else {
+                    /*$data['FirstName'] = 'Any';
+                    $data['LastName'] = 'things';
+                    $data['HomePhone'] = '8885554587';
+                    $data['StreetAddress1'] = '456 Main St';*/
+                    $data['HireDate'] = date('Y-m-d', strtotime($data['HireDate']));
+                    $data['LastPayDate'] = date('Y-m-d', strtotime($data['LastPayDate']));
+                    $data['BirthDate'] = date('Y-m-d', strtotime($data['BirthDate']));
+                    $data['DateAccountOpened'] = date('Y-m-d', strtotime($data['DateAccountOpened']));
+                    $data['SocialSecurityNumber'] = str_replace("-", "", $data['SocialSecurityNumber']);
+                    //$data['PayFrequency'] = 'MONTHLY';
+                    Log::info($data);
+                    $progressive_request = $progressive->SubmitPartialApplication($data);
+                    Log::info($progressive_request);
+                    if ($progressive_request['success']) {
+                        // Make the invoice
+                        $account_id = $progressive_request['result']['AccountNumber'];
+                        $request->session()->put('progressive_account_id', $account_id);
+                        $invoice_request = $progressive->createInvoice($request->get('orderNumber'), $request->get('customer_id'), $account_id);
+                        if($invoice_request['success']){
+                            $request->session()->forget('progressive_account_id');
+                        }
+                        Log::info($invoice_request);
+                        return response()->json($invoice_request);
+                    } else {
+                        return response()->json($progressive_request);
+                    }
+                }
+            }else{
+                Log::info($validateABA);
+                return response()->json(["success"=>false,"error"=>true,"msg"=>"Invalid Bank account information"]);
+            }
+        }else{
+            return response()->json($customer_data);
+        }
+
     }
     public function authorizebread(Request $request){
         $bread = new Bread();

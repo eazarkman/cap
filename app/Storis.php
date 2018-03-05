@@ -26,14 +26,14 @@ class Storis extends Model
         $customer["applicant"]["currentAddress"]["address2"] = $customer['apt_number'];
         $customer["applicant"]["currentAddress"]["city"] = $customer['city'];
         $customer["applicant"]["currentAddress"]["state"] = $customer['state'];
-        $customer["applicant"]["currentAddress"]["zipCode"] = $customer['zipcode'];
-        $customer["applicant"]["fullName"] = $customer['firstname'].' '.$customer['lastname'];
-        $customer["applicant"]["firstName"] = $customer['firstname'];
-        $customer["applicant"]["lastName"] = $customer['lastname'];
+        $customer["applicant"]["currentAddress"]["zipCode"] = $customer['zip'];
+        $customer["applicant"]["fullName"] = $customer['first_name'].' '.$customer['last_name'];
+        $customer["applicant"]["firstName"] = $customer['first_name'];
+        $customer["applicant"]["lastName"] = $customer['last_name'];
         $customer["applicant"]["emailAddress"] = $customer['email'];
-        $customer["applicant"]["homephone"] = $customer['homephone'];
-        $customer["applicant"]["cellPhone"] = $customer['varphone'];
-        $customer["applicant"]["workPhone"] = $customer['business_phone'];
+        $customer["applicant"]["homephone"] = $customer['home_phone'];
+        $customer["applicant"]["cellPhone"] = $customer['cell_phone'];
+        $customer["applicant"]["workPhone"] = $customer['work_phone'];
         $customer["applicant"]["dob"] = '/Date('.(strtotime($customer['dob'].'+1 day')*1000).'-0400)/';
 
         $url = $this->storis_url.'/'.$this->storis_token.'/creditapplication';
@@ -99,7 +99,7 @@ class Storis extends Model
     }
 
     public function getOrder($order_id,$customer_id){
-        $url = $this->storis_url.'/'.$this->storis_token.'/orders/'.$order_id.',1?customerId='.$customer_id;
+        $url = $this->storis_url.'/'.$this->storis_token.'/orders/'.$order_id.',2?customerId='.$customer_id;
         $headers[] = 'content-type: application/json';
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

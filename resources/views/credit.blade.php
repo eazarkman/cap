@@ -9,19 +9,29 @@
                 </h1>
             </section>
             <section class="content" id="customer_check">
-                <div class="box box-primary">
-                    <div class="col-md-6">
+                <div id="progressive_aggreement" style="display: none">
+
+                </div>
+                <div class="box box-primary" id="credit_form_data">
+                    <div class="col-md-9">
                         <div class="box-body">
                             <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}" id="customerNumber">
                                 <label for="name" class="col-md-4 control-label">Customer Number: </label>
                                 <input id="customer_number" type="text" class="form-control" name="customer_number" value="" required autofocus>
                             </div>
+
+                            <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}" id="orderNumber" style="display: none;">
+                                <label for="name" class="col-md-4 control-label">Customer Order Number: </label>
+                                <input id="orderNumber" type="text" class="form-control" name="orderNumber" value="" required autofocus>
+                            </div>
+
                             <div class="form-group" id="credit_source">
                                 <div class="form-group">
                                     <label for="equity" class="col-md-4 control-label">Source </label>
-                                    <select class="form-control" name="admin" id="customer_source" disabled="disabled">
+                                    <select class="form-control" name="admin" id="customer_source" onchange="sourceUpdate()">
                                         <!--option value="sw">Starworld</option-->
                                         <option value="bread">Bread</option>
+                                        <option value="progressive">Progressive</option>
                                     </select>
                                 </div>
                             </div>
@@ -36,9 +46,103 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Employment Information -->
+                    <div class="col-md-6" id="employment_info" style="display:none;">
+                        <div class="box-body">
+                            <div class="emp_info form-group{{ $errors->has('name') ? ' has-error' : '' }}" id="customerNumber">
+                                <label for="name" class="col-md-4 control-label">Employer Name: </label>
+                                <input id="EmployerName" type="text" class="form-control" name="EmployerName" value="" required autofocus>
+                            </div>
+                            <div class="emp_info form-group" id="credit_source">
+                                <div class="form-group">
+                                    <label for="equity" class="col-md-4 control-label">Hire Date </label>
+                                    <input id="HireDate" type="text" class="simple-field-data-mask form-control" data-mask="0000-00-00" placeholder="yyyy-mm-dd" name="HireDate" value="" required autofocus>
+                                </div>
+                            </div>
+                            <div class="emp_info form-group" id="credit_source">
+                                <div class="form-group">
+                                    <label for="equity" class="col-md-4 control-label">Monthly Gross Income </label>
+                                    <input id="MonthlyGrossIncome" type="text" class="form-control" data-mask="000000000" placeholder="XXXXXXXXX" name="MonthlyGrossIncome" value="" required autofocus>
+                                </div>
+                            </div>
+                            <div class="emp_info form-group" id="credit_source">
+                                <div class="form-group">
+                                    <label for="equity" class="col-md-4 control-label">Last Pay Date </label>
+                                    <input id="LastPayDate" type="text" class="simple-field-data-mask form-control" data-mask="0000-00-00" placeholder="yyyy-mm-dd" name="LastPayDate" value="" required autofocus>
+                                </div>
+                            </div>
+                            <div class="emp_info form-group" id="PayFrequency">
+                                <div class="form-group">
+                                    <label for="equity" class="col-md-4 control-label">PayFrequency </label>
+                                    <select class="form-control" name="admin" id="PayFrequency">
+                                        <option value="BI-WEEKLY">BI-WEEKLY</option>
+                                        <option value="WEEKLY">WEEKLY</option>
+                                        <option value="SEMI-MONTHLY">SEMI-MONTHLY</option>
+                                        <option value="MONTHLY">MONTHLY</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" id="credit_source">
+                                <div class="form-group">
+                                    <label for="equity" class="col-md-4 control-label">Social Security Number </label>
+                                    <input id="SocialSecurityNumber" type="text" data-mask="000-00-0000" placeholder="XXX-XX-XXXX" class="form-control" name="SocialSecurityNumber" value="" required autofocus>
+                                </div>
+                            </div>
+                            <div class="form-group" id="credit_source">
+                                <div class="form-group">
+                                    <label for="equity" class="col-md-4 control-label">Birth Date </label>
+                                    <input id="BirthDate" type="text" class="form-control" data-mask="0000-00-00" placeholder="yyyy-mm-dd" name="BirthDate" value="" required autofocus>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Bank and Credit card Information -->
+                    <div class="col-md-6" id="bank_info" style="display:none;">
+                        <div class="box-body">
+                            <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}" id="customerNumber">
+                                <label for="name" class="col-md-4 control-label">Bank Name: </label>
+                                <input id="BankName" type="text" class="form-control" name="BankName" value="" required autofocus>
+                            </div>
+                            <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}" id="customerNumber">
+                                <label for="name" class="col-md-4 control-label">ABA Routing Number: </label>
+                                <input id="ABARoutingNumber" type="text" class="form-control" name="ABARoutingNumber" value="" required autofocus>
+                            </div>
+                            <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}" id="customerNumber">
+                                <label for="name" class="col-md-4 control-label">Account Number: </label>
+                                <input id="AccountNumber" type="text" class="form-control" name="AccountNumber" value="" required autofocus>
+                            </div>
+
+
+                            <div class="form-group" id="credit_source">
+                                <div class="form-group">
+                                    <label for="equity" class="col-md-4 control-label">Account Type </label>
+                                    <select class="form-control" name="admin" id="AccountType">
+                                        <!--option value="sw">Starworld</option-->
+                                        <option value="Checking">Checking</option>
+                                        <option value="Savings">Savings</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}" id="customerNumber">
+                                <label for="name" class="col-md-4 control-label">Date Account Opened: </label>
+                                <input id="DateAccountOpened" type="text" class="simple-field-data-mask form-control" data-mask="0000-00-00" placeholder="yyyy-mm-dd" name="DateAccountOpened" value="" required autofocus>
+                            </div>
+                            <div class="form-group" id="credit_source">
+                                <div class="form-group">
+                                    <label for="equity" class="col-md-4 control-label">First Six digit of Credit card </label>
+                                    <input id="CreditCardBin" type="text" class="form-control" data-mask="000000" placeholder="XXXXXX" name="CreditCardBin" value="" required autofocus>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
                     <div style="clear: both;"></div>
                     <div class="box-footer">
-                        <button type="submit" class="btn btn-info pull-right" onclick="return checkCustomer()">Check</button>
+                        <button type="submit" id="initial_check_button" class="btn btn-info pull-right" onclick="return checkCustomer()">Check</button>
                     </div>
                 </div>
 
@@ -104,14 +208,53 @@
                     <input type="hidden" name="state" id="state">
                     <input type="hidden" name="phone" id="phone">
                     <input type="hidden" name="email" id="email">
+                    <input type="hidden" name="first_name" id="first_name">
+                    <input type="hidden" name="last_name" id="last_name">
                 </form>
             </section>
             <!-- /.content -->
         </div>
-        @include('layouts.contentfooter')
+       <div id="register_link" style="display:none"></div>
+       <div id="registerloading">
+           <img src="dist/img/ajax-loader.gif" class="user-image" alt="User Image">
+       </div>
+       <style>
+           #register_link{top:0;right:0;width:100%;height:100%;position:fixed;z-index:9998;text-align:center;filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);-moz-opacity:.8;-khtml-opacity:.8;opacity:.8;background-color:#000}
+           #registerloading{background: #fff;display:none;position:fixed;top:40%;left:42%;z-index:9999;margin: -70px 0 0 -150px;text-align: center;width: 780px;padding: 20px 10px;font-weight: 700;line-height: 1.2em;border-radius: 6px;-moz-border-radius: 6px;-webkit-border-radius: 6px;}
+           #registerloading .ajx-loading{width: 36px;display: block;margin: 0 auto 20px;}</style>
+
+       @include('layouts.contentfooter')
         <div class="control-sidebar-bg"></div>
     <!-- ./wrapper -->
+       <script type="text/javascript" src="http://code.jquery.com/jquery-3.0.0.min.js"></script>
+       <script type="text/javascript" src="dist/js/jquery.mask.js"></script>
        <script type="text/javascript">
+           $(function () {
+               //Date picker
+               $('#HireDate').datepicker({
+                   autoclose: true,
+                   changeMonth: true,
+                   changeYear: true,
+               });
+
+               $('#BirthDate').datepicker({
+                   autoclose: true,
+                   changeMonth: true,
+                   changeYear: true,
+               });
+               $('#DateAccountOpened').datepicker({
+                   autoclose: true,
+                   changeMonth: true,
+                   changeYear: true,
+               });
+
+
+               $('#LastPayDate').datepicker({
+                   autoclose: true,
+                   changeMonth: true,
+                   changeYear: true,
+               });
+           })
            var items = [];
            var tax = 0;
            function checkOrder(){
@@ -146,6 +289,11 @@
                                $('#shoppingcart').show();
                            }else if(data.status == 'not supported'){
                                alert(data.msg);
+                           }else if(data.additional_info){
+                               jQuery("#employment_info").show('slow');
+                               jQuery("#bank_info").show('slow');
+                               jQuery("#orderNumber").show('slow');
+                               jQuery("#initial_check_button").attr('onclick','return runprogressive()');
                            }else{
                                // Proper Alert Message for the usser
                                alert('Applicaiton matches Star world credit criteria. No further action required. Please contact finance department for more update');
@@ -190,6 +338,10 @@
                               break;
                           case 'NOT_PREQUALIFIED':
                               console.log(customerEmail + " was not prequalified for financing."); // Here to add conditional check to send this applicaiton to Progressive
+                              jQuery("#employment_info").show('slow');
+                              jQuery("#bank_info").show('slow');
+                              jQuery("#orderNumber").show('slow');
+                              jQuery("#initial_check_button").attr('onclick','return runprogressive()');
                               break;
                           case 'ABANDONED':
                               if (customerEmail === undefined || customerEmail === null) {
@@ -236,8 +388,12 @@
               }
           }
           function checkCustomer() {
+              $("#register_link").show();
+              $("#registerloading").show();
               $.get('checkapp', {customer_id: $("#customer_number").val(),source: $("#customer_source").val(),language: $("#prefered_language").val()},
                       function(data) {
+                          $("#register_link").hide();
+                          $("#registerloading").hide();
                           if(data.status=='not found'){
                               alert('No Application Found !!');
                           } else if (data.showapplicaiton){
@@ -258,11 +414,68 @@
                               $('#shoppingcart').show();
                           }else if(data.status == 'not supported'){
                               alert(data.msg);
+                          }else if(data.additional_info){
+                              jQuery("#employment_info").show('slow');
+                              jQuery("#bank_info").show('slow');
+                              /*if(!data.employer_info){
+                                  $(".emp_info").hide();
+                              }*/
+                              jQuery("#orderNumber").show('slow');
+                              jQuery("#initial_check_button").attr('onclick','return runprogressive()');
                           }else{
                               // Proper Alert Message for the usser
                               alert('Applicaiton matches Star world credit criteria. No further action required. Please contact finance department for more update');
                           }
                       });
           }
+          function sourceUpdate() {
+              if(jQuery("#customer_source").val() == 'progressive'){
+                   //jQuery("#employment_info").show('slow');
+                   //jQuery("#bank_info").show('slow');
+                   //jQuery("#orderNumber").show('slow');
+                   //jQuery("#initial_check_button").attr('onclick','return runprogressive()');
+              }
+          }
+
+           function runprogressive(){
+               $("#register_link").show();
+               $("#registerloading").show();
+               var request = {
+                    customer_id: $("#customer_number").val()
+                   ,source: $("#customer_source").val()
+                   ,language: $("#prefered_language").val()
+                   ,orderNumber : $("#orderNumber").val()
+                   ,EmployerName : $("#EmployerName").val()
+                   ,HireDate : $("#HireDate").val()
+                   ,MonthlyGrossIncome : $("#MonthlyGrossIncome").val()
+                   ,LastPayDate : $("#LastPayDate").val()
+                   ,PayFrequency : $("#PayFrequency").val()
+                   ,BankName : $("#BankName").val()
+                   ,ABARoutingNumber : $("#ABARoutingNumber").val()
+                   ,AccountNumber : $("#AccountNumber").val()
+                   ,AccountType : $("#AccountType").val()
+                   ,DateAccountOpened : $("#DateAccountOpened").val()
+                   ,NumberOfNSFees : $("#NumberOfNSFees").val()
+                   ,NumberOfOverDraftFees : $("#NumberOfOverDraftFees").val()
+                   ,SocialSecurityNumber : $("#SocialSecurityNumber").val()
+                   ,BirthDate : $("#BirthDate").val()
+                   ,CreditCardBin : $("#CreditCardBin").val()
+               }
+               $.get('runprogressive', request,
+                   function(data) {
+                        if(data.success){
+                            $("#progressive_aggreement")
+                                    .html('<object data="'+data.result.EsignURL+'" height="600px" width="100%"/>');
+                            $("#progressive_aggreement").show('slow')
+                            $("#credit_form_data").hide('slow')
+                            $("#register_link").hide();
+                            $("#registerloading").hide();
+                        }else{
+                            $("#register_link").hide();
+                            $("#registerloading").hide();
+                            alert(data.msg);
+                        }
+                   });
+           }
        </script>
 @endsection
